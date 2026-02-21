@@ -1,63 +1,179 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
+
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(600, 500)  # Updated size to 600x500
+        Dialog.setObjectName("Home")
+        Dialog.setMinimumSize(900, 620)
 
-        # Title Label
-        self.titleLabel = QtWidgets.QLabel(Dialog)
-        self.titleLabel.setGeometry(QtCore.QRect(0, 20, 600, 60))
-        font = QtGui.QFont()
-        font.setPointSize(32)
-        self.titleLabel.setFont(font)
-        self.titleLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.titleLabel.setObjectName("titleLabel")
+        root = QtWidgets.QVBoxLayout(Dialog)
+        root.setContentsMargins(24, 24, 24, 24)
+        root.setSpacing(18)
 
-        # Instruction Label
-        self.instructionLabel = QtWidgets.QLabel(Dialog)
-        self.instructionLabel.setGeometry(QtCore.QRect(0, 100, 600, 40))
-        font_instr = QtGui.QFont()
-        font_instr.setPointSize(16)
-        self.instructionLabel.setFont(font_instr)
-        self.instructionLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.instructionLabel.setObjectName("instructionLabel")
+        # -------------------------
+        # App Bar
+        # -------------------------
+        appbar = QtWidgets.QFrame(Dialog)
+        appbar.setObjectName("AppBar")
+        appbar_layout = QtWidgets.QVBoxLayout(appbar)
+        appbar_layout.setContentsMargins(18, 16, 18, 16)
+        appbar_layout.setSpacing(6)
 
-        # Extract Invoice Data Button
-        self.Extractinvoicbutton = QtWidgets.QPushButton(Dialog)
-        self.Extractinvoicbutton.setGeometry(QtCore.QRect(50, 200, 220, 50))
-        font_btn = QtGui.QFont()
-        font_btn.setPointSize(12)
-        self.Extractinvoicbutton.setFont(font_btn)
-        self.Extractinvoicbutton.setObjectName("Extractinvoicbutton")
-        self.Extractinvoicbutton.setStyleSheet(
-            "border-radius: 25px; background-color: #9E4FFF; color: white;"
+        self.titleLabel = QtWidgets.QLabel("XtractPDF", appbar)
+        self.titleLabel.setObjectName("Title")
+
+        self.instructionLabel = QtWidgets.QLabel(
+            "PDF processing toolkit — extract invoice data and compare cargo manifests.",
+            appbar
         )
+        self.instructionLabel.setObjectName("Subtitle")
 
-        # Compare Cargo Manifests Button
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_2.setGeometry(QtCore.QRect(330, 200, 220, 50))
-        font_btn2 = QtGui.QFont()
-        font_btn2.setPointSize(12)
-        self.pushButton_2.setFont(font_btn2)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.setStyleSheet(
-            "border-radius: 25px; background-color: #9E4FFF; color: white;"
+        appbar_layout.addWidget(self.titleLabel)
+        appbar_layout.addWidget(self.instructionLabel)
+        root.addWidget(appbar)
+
+        # -------------------------
+        # Overview / How it works
+        # -------------------------
+        overview = QtWidgets.QFrame(Dialog)
+        overview.setObjectName("Card")
+        ov_layout = QtWidgets.QVBoxLayout(overview)
+        ov_layout.setContentsMargins(18, 18, 18, 18)
+        ov_layout.setSpacing(8)
+
+        ov_title = QtWidgets.QLabel("Quick Overview", overview)
+        ov_title.setStyleSheet("font-size: 13pt; font-weight: 800; color: #FFFFFF;")
+
+        ov_desc = QtWidgets.QLabel(
+            "Use this tool to convert operational PDFs into clean Excel outputs. "
+            "It supports table extraction, manifest merging, and export workflows.",
+            overview
         )
+        ov_desc.setWordWrap(True)
+        ov_desc.setStyleSheet("color: #A8A8A8;")
 
-        self.retranslateUi(Dialog)
+        # small “pill” row
+        pills = QtWidgets.QHBoxLayout()
+        pills.setSpacing(10)
+        pills.addWidget(self._pill("Fast exports"))
+        pills.addWidget(self._pill("Excel ready (.xlsx)"))
+        pills.addWidget(self._pill("Works offline"))
+        pills.addStretch(1)
+
+        ov_layout.addWidget(ov_title)
+        ov_layout.addWidget(ov_desc)
+        ov_layout.addLayout(pills)
+
+        root.addWidget(overview)
+
+        # -------------------------
+        # Feature Cards
+        # -------------------------
+        row = QtWidgets.QHBoxLayout()
+        row.setSpacing(18)
+
+        card1 = self._make_card(
+            Dialog,
+            title="Extract Invoice Data",
+            desc="Turn invoice PDFs into structured Excel tables — ready for finance / ops workflows.",
+            bullets=[
+                "Extract tables from invoices",
+                "Cleaned columns and rows",
+                "Export to .xlsx for reporting",
+            ],
+            button_text="Open",
+            button_obj_name="Extractinvoicbutton",
+        )
+        self.Extractinvoicbutton = card1.findChild(QtWidgets.QPushButton, "Extractinvoicbutton")
+
+        card2 = self._make_card(
+            Dialog,
+            title="Compare Cargo Manifests",
+            desc="Merge two parent manifests with a child manifest and generate final Master/Baby output.",
+            bullets=[
+                "Merge by HAWB",
+                "Expand secondary tracking numbers",
+                "Final column ordering + Excel export",
+            ],
+            button_text="Open",
+            button_obj_name="pushButton_2",
+        )
+        self.pushButton_2 = card2.findChild(QtWidgets.QPushButton, "pushButton_2")
+
+        row.addWidget(card1)
+        row.addWidget(card2)
+        root.addLayout(row)
+
+        # -------------------------
+        # Footer tip
+        # -------------------------
+        tip = QtWidgets.QLabel(
+            "Tip: Best results come from PDFs with selectable text (not scanned images).",
+            Dialog
+        )
+        tip.setStyleSheet("color: #8F8F8F; font-size: 10.5pt;")
+        root.addWidget(tip)
+
+        root.addStretch(1)
+
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-    def retranslateUi(self, Dialog):
-        _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Main Window"))
-        self.titleLabel.setText(_translate("Dialog", "XtractPDF"))
-        self.instructionLabel.setText(_translate("Dialog", "Choose an option below to proceed"))
-        self.Extractinvoicbutton.setText(_translate("Dialog", "Extract Invoice Data"))
-        self.pushButton_2.setText(_translate("Dialog", "Compare Cargo Manifests"))
+    # ---------- UI helpers ----------
+
+    def _pill(self, text: str):
+        lbl = QtWidgets.QLabel(text)
+        lbl.setStyleSheet("""
+            QLabel {
+                background-color: #1E1E1E;
+                border: 1px solid #2C2C2C;
+                padding: 6px 10px;
+                border-radius: 999px;
+                color: #CFCFCF;
+                font-weight: 600;
+            }
+        """)
+        return lbl
+
+    def _make_card(self, parent, title: str, desc: str, bullets, button_text: str, button_obj_name: str):
+        card = QtWidgets.QFrame(parent)
+        card.setObjectName("Card")
+
+        layout = QtWidgets.QVBoxLayout(card)
+        layout.setContentsMargins(18, 18, 18, 18)
+        layout.setSpacing(10)
+
+        t = QtWidgets.QLabel(title, card)
+        t.setStyleSheet("font-size: 15pt; font-weight: 800; color: #FFFFFF;")
+
+        d = QtWidgets.QLabel(desc, card)
+        d.setWordWrap(True)
+        d.setStyleSheet("color: #A8A8A8;")
+
+        # bullet list
+        bullet_box = QtWidgets.QVBoxLayout()
+        bullet_box.setSpacing(6)
+        for b in bullets:
+            bullet = QtWidgets.QLabel(f"• {b}", card)
+            bullet.setStyleSheet("color: #CFCFCF;")
+            bullet_box.addWidget(bullet)
+
+        btn = QtWidgets.QPushButton(button_text, card)
+        btn.setObjectName(button_obj_name)
+        btn.setMinimumHeight(42)
+
+        layout.addWidget(t)
+        layout.addWidget(d)
+        layout.addLayout(bullet_box)
+        layout.addStretch(1)
+        layout.addWidget(btn)
+
+        return card
+
 
 if __name__ == "__main__":
     import sys
+    from PyQt5 import QtWidgets
+
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QWidget()
     ui = Ui_Dialog()
